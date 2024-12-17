@@ -13,7 +13,7 @@ authRoute.post('/verify-email', verifyEmail);
 authRoute.post('/forgot-password', forgotPassword);
 authRoute.post('/reset-password/:token', resetPassword);
 
-authRoute.post('/checkAuth',verifyToken, checkAuth);
+authRoute.get('/check-auth',verifyToken, checkAuth);
 
 
 
