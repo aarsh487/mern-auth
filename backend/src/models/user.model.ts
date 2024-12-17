@@ -6,8 +6,8 @@ export interface UserDocument extends Document {
     name: string;
     lastLogin: Date;
     isVerified: boolean;
-    resetPasswordToken: string;
-    resetPasswordExpiresAt: Date;
+    resetPasswordToken?: string;
+    resetPasswordExpiresAt?: Date;
     verificationToken?: string;
     verificationTokenExpiresAt?: Date;
 };

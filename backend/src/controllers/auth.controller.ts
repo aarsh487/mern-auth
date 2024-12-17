@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { UserModel } from "../models/user.model";
 import bcrypt from 'bcrypt';
 import { generateTokenAndSetCookies } from "../utils/generateTokenAndSetCookies";
-import { ResolvePathType } from "mongoose/types/inferschematype";
 
 export const signup = async(req: Request, res: Response) => {
     const signupSchema = z.object({
@@ -60,7 +59,7 @@ export const signup = async(req: Request, res: Response) => {
             res.status(400).json({ errors, message: error.message });
         } else{
             console.log("Error while signup:", error);
-            res.status(500).json({ message: "Internal Server Error" })
+            res.status(500).json({ success: false, message: "Internal Server Error" })
         }
     }
 };
@@ -105,7 +104,7 @@ export const verifyEmail = async(req: Request, res: Response) => {
             res.status(400).json({ errors, message: error.message });
         } else{
             console.log("Error while verification:", error);
-            res.status(500).json({ message: "Internal Server Error" })
+            res.status(500).json({ success: false, message: "Internal Server Error" })
         }
     }
 };
@@ -161,7 +160,7 @@ export const login = async(req: Request, res: Response) => {
             res.status(400).json({ errors, message: error.message });
         } else{
             console.log("Error while login:", error);
-            res.status(500).json({ message: "Internal Server Error" })
+            res.status(500).json({ success: false, message: "Internal Server Error" })
         }
     }
 };
@@ -200,12 +199,75 @@ export const forgotPassword = async(req: Request, res: Response) => {
             res.status(400).json({ errors, message: error.message });
         } else{
             console.log("Error while Forgot password:", error);
-            res.status(500).json({ message: "Internal Server Error" })
+            res.status(500).json({ success: false, message: "Internal Server Error" })
         }
     }
 };
 
 
 export const resetPassword = async(req: Request, res: Response) => {
-    
-}
+    const resetPasswordSchema = z.object({
+        password: z
+        .string()
+        .min(8, "Password must be at least 8 characters long")
+        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/\d/, "Password must contain at least one digit")
+        .regex(/[@$!%*?&#]/, "Password must contain at least one special character"),
+    });
+    const { token } = req.params;
+    try {
+        const request = resetPasswordSchema.parse({
+            ...req.body
+        });
+
+        const user = await UserModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiresAt: { $gt: Date.now() }
+        });
+
+        if(!user){
+            res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+            return;
+        }
+
+        const hashedPassword = await bcrypt.hash(request.password, 10);
+
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+        await user.save();
+
+        res.json(200).json({ 
+            success: true, 
+            message: "Password reset successfull" 
+        });
+        
+    } catch (error) {
+        if( error instanceof z.ZodError){
+            const errors = error.issues.map((err) => ({
+                path: err.path.join("."),
+                message: err.message,
+            }));
+            res.status(400).json({ errors, message: error.message });
+        } else{
+            console.log("Error while reset password:", error);
+            res.status(500).json({ success: false, message: "Internal Server Error" })
+        }
+    }
+};
+
+export const checkAuth = async(req: Request, res: Response) => {
+    try {
+        const user = await UserModel.findById(req.userId).select("-password");
+        if(!user){
+            res.status(400).json({ success: true, message: "Invalid or expired reset token" });
+            return;
+        }
+
+        res.status(200).json({ success: true, message: "User found successfully", user });
+    } catch (error) {
+        console.log("Error while authentication:", error);
+            res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+};
