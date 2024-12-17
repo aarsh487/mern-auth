@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { UserModel } from "../models/user.model";
 import bcrypt from 'bcrypt';
 import { generateTokenAndSetCookies } from "../utils/generateTokenAndSetCookies";
+import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail } from "../mailtrap/emails";
+import crypto from 'crypto';
+import { CLIENT_URL } from "../utils/config";
 
 export const signup = async(req: Request, res: Response) => {
     const signupSchema = z.object({
@@ -43,6 +46,8 @@ export const signup = async(req: Request, res: Response) => {
         });
 
         generateTokenAndSetCookies(res, user._id as string);
+        await sendVerificationEmail(user.email, verificationToken);
+
         const userObject = user.toObject();
         const { password, ...userWithoutPassword } = userObject;
         res.status(201).json({ 
@@ -188,7 +193,20 @@ export const forgotPassword = async(req: Request, res: Response) => {
             return;
         };
 
-        // generate resetPassword token 
+        // generate resetPassword token
+        const resetToken = crypto.randomBytes(20).toString("hex");
+		const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000 as unknown as  Date;
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+        await user.save();
+
+        await sendPasswordResetEmail(user.email, `${CLIENT_URL}/reset-password/${resetToken}`);
+        res.status(200).json({ 
+            success: true, 
+            message: "Password reset link sent to your email" 
+        });
 
     } catch (error) {
         if( error instanceof z.ZodError){
@@ -238,7 +256,9 @@ export const resetPassword = async(req: Request, res: Response) => {
         user.resetPasswordExpiresAt = undefined;
         await user.save();
 
-        res.json(200).json({ 
+        await sendResetSuccessEmail(user.email);
+
+        res.status(200).json({ 
             success: true, 
             message: "Password reset successfull" 
         });
@@ -265,7 +285,11 @@ export const checkAuth = async(req: Request, res: Response) => {
             return;
         }
 
-        res.status(200).json({ success: true, message: "User found successfully", user });
+        res.status(200).json({ 
+            success: true, 
+            message: "User found successfully", 
+            user 
+        });
     } catch (error) {
         console.log("Error while authentication:", error);
             res.status(500).json({ success: false, message: "Internal Server Error" })
