@@ -1,8 +1,18 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axiosInstance';
 
+interface UserSchema {
+    _id: string;
+    email: string;
+    password: string;
+    name: string;
+    lastLogin: Date;
+    isVerified: boolean;
+    createdAt: Date;
+}
+
 interface StoreSchema {
-    user: string | null;
+    user: UserSchema | null;
     isAuthenticated: boolean;
     error: string | null;
     isLoading: boolean;
