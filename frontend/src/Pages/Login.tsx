@@ -40,7 +40,7 @@ export const Login = () => {
             type={"text"} 
             placeholder={"Password"} 
           />
-          <button onClick={handleLogin} className="w-[318px] h-[40px] bg-black text-white rounded-md p-2">Sign In</button>
+          <button onClick={handleLogin} className="w-[318px] h-[40px] bg-black text-white rounded-md text-center">Sign In</button>
           <span className="text-center text-sm">Dont't have an acoount?
             <Link className="pl-1 underline text-purple-700" to="/signup">Sign up</Link>
           </span>

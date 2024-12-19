@@ -54,7 +54,7 @@ export const Signup = () => {
             type={"password"} 
             placeholder={"Confirm Password"} 
           />
-          <button onClick={handleSignup} className="w-[318px] h-[40px] bg-black text-white rounded-md p-2">Sign Up</button>
+          <button onClick={handleSignup} className="w-[318px] h-[40px] bg-black text-white rounded-md text-center">Sign Up</button>
           <span className="text-center text-sm">Already have an acoount?
             <Link className="pl-1 underline text-purple-700" to="/login">Sign in</Link>
           </span>

@@ -8,8 +8,8 @@ export const EmailVerifcation = () => {
 
     const navigate = useNavigate();
 
-    const handleOtpSubmit = async(token: string) => {
-        await verifyEmail(token);
+    const handleOtpSubmit = (token: string) => {
+        verifyEmail(token);
         navigate('/')
     };
   return (

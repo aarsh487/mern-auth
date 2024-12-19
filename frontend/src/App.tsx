@@ -3,6 +3,8 @@ import { Signup } from "./Pages/Signup";
 import { Login } from "./Pages/Login";
 import { Homepage } from "./Pages/Homepage";
 import { EmailVerifcation } from "./Pages/EmailVerifcation";
+import { ForgotPassword } from "./Pages/ForgotPassword";
+import { ResetPassword } from "./Pages/ResetPassword";
 
 
 export default function App() {
@@ -14,6 +16,8 @@ export default function App() {
           <Route path="/signup" element={ <Signup />} />
           <Route path="/login" element={ <Login />} />
           <Route path="/verify-email" element={ <EmailVerifcation />} />
+          <Route path="/forgot-password" element={ <ForgotPassword />} />
+          <Route path="/reset-password" element={ <ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </div>

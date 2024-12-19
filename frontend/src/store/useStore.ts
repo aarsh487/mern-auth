@@ -20,6 +20,7 @@ interface StoreSchema {
     message: string | null;
     signup: ( email: string, password: string, name: string, confirmPassword: string) => void;
     login: ( email: string, password: string) => void;
+    logout: () => void;
     verifyEmail: (verificationToken: string) => void;
     checkAuth: () => void;
     forgotPassword: (email: string) => void;
@@ -123,4 +124,4 @@ export const useStore = create<StoreSchema>((set) => ({
             throw error;
         }
     }
-}))
+}));

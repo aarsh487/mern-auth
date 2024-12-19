@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 
 interface InputElementInterface {
     type: string;
@@ -9,19 +9,15 @@ interface InputElementInterface {
 
 }
 
-export const InputElement = ({ iconOn, iconOff, reference, type, placeholder }: InputElementInterface) => {
-  const [ isPassword, setIsPassword ] = useState(false);
+export const InputElement = ({ reference, type, placeholder }: InputElementInterface) => {
   return (
     <div className="">
         <input
             className="w-[318px] h-[37px] rounded-md bg-white border border-slate-300 p-3"
-            type={ !isPassword ? type : "password"} 
+            type={type} 
             placeholder={placeholder}
             ref={reference}
-        />
-        <div onClick={() => setIsPassword(!isPassword)} className="fixed mx-72 -my-6 cursor-pointer">
-          {!isPassword ? iconOn : iconOff }
-        </div>        
+        />        
     </div>
   )
 }
