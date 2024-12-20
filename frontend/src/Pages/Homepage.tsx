@@ -8,6 +8,12 @@ export const Homepage = () => {
     logout();
   }
 
+  const formatDate = (date: string | Date | undefined | null): string => {
+    if (!date) return 'N/A';
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
+    return `${parsedDate.toLocaleDateString()} ${parsedDate.toLocaleTimeString()}`;
+  };
+
   useEffect(() => {
     checkAuth();
   },[])
@@ -36,11 +42,11 @@ export const Homepage = () => {
         <div className='w-[20rem] h-[10rem] bg-slate-50 shadow-lg rounded-2xl'>
           <div className='flex justify-between p-6'>
             <h4>Last Login</h4>
-            <span>{user?.lastLogin ? user?.lastLogin.toLocaleDateString() : 'N/A'}</span>
+            <span>{formatDate(user?.lastLogin)}</span>
           </div>
           <div className='flex justify-between p-6'>
             <h4>Joined</h4>
-            <span>{user?.lastLogin ? user?.createdAt.toLocaleDateString() : 'N/A'}</span>
+            <span>{formatDate(user?.createdAt)}</span>
           </div>
         </div>
       </div>
